@@ -63,7 +63,7 @@ var NoteList = React.createClass({
         var that = this;
 	    var titles = [];
 	    this.props.notes.forEach(function(note){
-	        titles.push(<IndivNote note={note} remove={that.props.deleteNote} />)
+	        titles.push(<IndivNote note={note} remove={that.props.deleteNote.bind(null,note)} />)
 	    });
 
 	    return (
@@ -110,8 +110,11 @@ var TextEditor = React.createClass({
 
 
 var NoteApp = React.createClass({
-    deleteNote: function(){
+    deleteNote: function( note ){
         console.log('delete note clicked');
+        console.log(note);
+        this.state.notes.splice(this.state.notes.indexOf(note),1);
+        this.setState(this.state);
     },
 
     getInitialState: function() {
@@ -130,7 +133,6 @@ var NoteApp = React.createClass({
 });
 
 React.render(<NoteApp/>, document.body);
-
 
 
 </script>
