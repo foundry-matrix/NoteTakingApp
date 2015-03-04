@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hello world</title>
+    <script src="http://fb.me/react-0.12.1.js"></script>
+    <script src="http://fb.me/JSXTransformer-0.12.1.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+
+<style type="text/css">
+.NoteApp{
+    margin: 30px auto;
+}
+
+
+.SearchField{
+    width: 100%;
+    padding-right: 0px;
+
+}
+.textarea{
+    width: 100%;
+    height: 300px;
+}
+
+.NoteList{
+    margin-top: 10px;
+    padding-left: 0px;
+    list-style-type: none;
+}
+</style>
+</head>
+<body>
+
+<script type="text/jsx">
+
+var people = [
+     {author: 'Amil', avatar: 'http://lorempixel.com/400/200', title: 'Amils Text1', avatar: 'http://lorempixel.com/400/200',  text: 'This is Amil here and this is my text'},
+     {author: 'Per', avatar: 'http://lorempixel.com/400/200',  title: 'Pers Text1', text: 'This is Per here and this is my text'},
+     {author: 'Ron', avatar: 'http://lorempixel.com/400/200',  title: 'Rons Text1', avatar: 'http://lorempixel.com/400/200',  text: 'This is Ron here and this is my text'},
+     {author: 'Amil', avatar: 'http://lorempixel.com/400/200',  title: 'Amils Text2', text: 'This is Amil here and this is my text'},
+     {author: 'Per', avatar: 'http://lorempixel.com/400/200',  title: 'Pers Text2', text: 'This is Per here and this is my text'},
+     {author: 'Ron', avatar: 'http://lorempixel.com/400/200',  title: 'Rons Text2', text: 'This is Ron here and this is my text'}
+];
+
+
+var Card = React.createClass({
+	render: function(){
+		return(
+		  <div>
+    			<h2>{this.props.author}</h2>
+    			<img src={this.props.avatar} alt="" />
+		        <input type="submit" onClick={this.props.remove} /> 
+          </div>
+		)
+	}
+});
+
+
+var App = React.createClass({
+
+    deletePerson: function(person){
+            this.state.people.splice(this.state.people.indexOf(person), 1);
+            this.setState(this.state);
+            console.log(people);
+            console.log(people.length);
+    },
+
+    getInitialState: function() {
+        return {
+            people : people
+        }
+    },
+	render: function() {
+        var that = this;
+		return (
+		  <div>
+			{this.state.people.map(function(person){
+                return(
+                    <Card remove={that.deletePerson.bind(null,person)}  author={person.author} avatar={person.avatar} />
+                    )
+            })
+            } 		
+          </div>
+          )
+	   }
+});
+
+
+
+React.render(<App/>, document.body);
+
+</script>
+
+
+</body>
+
+</html>
