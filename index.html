@@ -35,13 +35,14 @@
 
 <script type="text/jsx">
 
+
 var NOTES = [
-     {author: 'Amil', title: 'Amils Text1', text: 'This is Amil here and this is my text'},
-     {author: 'Per', title: 'Pers Text1', text: 'This is Per here and this is my text'},
-     {author: 'Ron', title: 'Rons Text1', text: 'This is Ron here and this is my text'},
-     {author: 'Amil', title: 'Amils Text2', text: 'This is Amil here and this is my text'},
-     {author: 'Per', title: 'Pers Text2', text: 'This is Per here and this is my text'},
-     {author: 'Ron', title: 'Rons Text2', text: 'This is Ron here and this is my text'}
+     {author: 'Amil', title: 'Amils Text', text: 'This is Amil here and this is my text'},
+     {author: 'Per', title: 'Pers Text', text: 'This is Per here and this is my text'},
+     {author: 'Ron', title: 'Rons Text', text: 'This is Ron here and this is my text'},
+     {author: 'John', title: 'John Text', text: 'This is John here and this is my text'},
+     {author: 'Nina', title: 'Nina Text', text: 'This is Nina here and this is my text'},
+     {author: 'Caroline', title: 'Caroline Text', text: 'This is Caroline here and this is my text'}
 ];
 
 
@@ -52,6 +53,7 @@ var IndivNote = React.createClass({
             <li>
                 <p> {this.props.note.title} </p>
                 <button onClick={this.props.remove} />
+               <button onClick={this.props.setActive} />
             </li>
         )
     }
@@ -63,7 +65,7 @@ var NoteList = React.createClass({
         var that = this;
 	    var titles = [];
 	    this.props.notes.forEach(function(note){
-	        titles.push(<IndivNote note={note} remove={that.props.deleteNote.bind(null,note)} />)
+	        titles.push(<IndivNote note={note} setActive={that.props.setActive.bind(null,note)} remove={that.props.deleteNote.bind(null,note)} />)
 	    });
 
 	    return (
@@ -89,7 +91,7 @@ var SearchableTable = React.createClass({
 		return (
 		    <div className="SearchableTable col-md-4 col-lg-4 col-sm-4 col-xs-4">
 		        <SearchField/>
-		        <NoteList notes={this.props.notes} deleteNote={this.props.deleteNote} />
+		        <NoteList notes={this.props.notes} setActive={this.props.setActive} deleteNote={this.props.deleteNote} />
 		    </div>
 		    )
 	}
@@ -98,11 +100,11 @@ var SearchableTable = React.createClass({
 
 
 var TextEditor = React.createClass({
-	render: function(){
-		return(
+	
+    render: function(){
+       return(
 		    <div className="TextEditor col-md-8 col-lg-8 col-sm-8 col-xs-12">
-		    <textarea className="textarea">{this.props.notes[0].text}</textarea>
-		    <input type="submit" />
+		    <textarea className="textarea" onChange={this.props.handleChange} value={this.props.notes[this.props.active_note_index].text}></textarea>
 		    </div>
 		    )
 		}
@@ -110,23 +112,65 @@ var TextEditor = React.createClass({
 
 
 var NoteApp = React.createClass({
-    deleteNote: function( note ){
-        console.log('delete note clicked');
-        console.log(note);
-        this.state.notes.splice(this.state.notes.indexOf(note),1);
-        this.setState(this.state);
-    },
-
+    
     getInitialState: function() {
         return {
-            notes : NOTES
+            notes : NOTES,
+            active_note_index: 0
         }
     },
+
+    setActive: function(note){
+       console.log('SetActive Triggered! Note:',note);
+       console.log('Index', this.state.notes.indexOf(note));
+       this.setState({
+            active_note_index: this.state.notes.indexOf(note)
+       })
+
+    },
+
+    handleChange: function(event){
+        var notes = this.state.notes;
+        notes[this.state.active_note_index].text = event.target.value;
+        this.setState({
+            notes: notes
+        })
+    },
+
+    deleteNote: function( note ){
+
+        // If the active note has a higher index than the one you're deleting.
+        if (this.state.notes.indexOf(note) < this.state.active_note_index ){
+            this.setState({
+                active_note_index: ( this.state.active_note_index - 1 )
+            }) 
+        }
+
+
+        // remove the selected note
+        this.state.notes.splice( this.state.notes.indexOf(note), 1 );
+        this.setState({notes:this.state.notes});
+        
+        // if you're deleting the last item, then decrement the active note index with one (or else, the active_note_index will be out of ratio)
+        if ( this.state.active_note_index == this.state.notes.length ) {
+            console.log('OUT OF RATIO:');
+            console.log('active_note_index: ',this.state.active_note_index)
+            console.log('notes.length: ', this.state.notes.length )
+            this.setState({
+                active_note_index: (this.state.active_note_index -1 )
+            })        
+        }
+
+
+    },
+
     render: function(){
+
         return ( 
             <div className="NoteApp col-md-6 col-lg-6 col-sm-8 col-xs-10">
-                <SearchableTable notes={this.state.notes} deleteNote={this.deleteNote} />
-                <TextEditor notes={this.state.notes}/>
+                <SearchableTable notes={this.state.notes}  setActive={this.setActive} deleteNote={this.deleteNote} />
+                <TextEditor handleChange={this.handleChange} notes={this.state.notes} active_note_index={this.state.active_note_index} />
+           
             </div>
         )
     }
